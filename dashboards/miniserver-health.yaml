@@ -1,141 +1,181 @@
-id: "d0321d6b-afa3-43ec-94bc-550b3b0a5984"
-name: "Loxone Miniserver Health"
+id: d0321d6b-afa3-43ec-94bc-550b3b0a5984
+name: Loxone Miniserver Health
 type: dashboard
 content:
   annotations: []
   importedWithCode: false
+  layouts:
+    can-errors:
+      h: 6
+      w: 12
+      x: 12
+      "y": 19
+    can-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 18
+    can-traffic:
+      h: 6
+      w: 12
+      x: 0
+      "y": 19
+    header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 0
+    heap-kpi:
+      h: 3
+      w: 8
+      x: 0
+      "y": 1
+    heap-timeseries:
+      h: 6
+      w: 12
+      x: 0
+      "y": 5
+    lan-errors:
+      h: 6
+      w: 12
+      x: 12
+      "y": 12
+    lan-errors-kpi:
+      h: 3
+      w: 8
+      x: 16
+      "y": 1
+    lan-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 11
+    lan-traffic:
+      h: 6
+      w: 12
+      x: 0
+      "y": 12
+    system-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 4
+    tasks-kpi:
+      h: 3
+      w: 8
+      x: 8
+      "y": 1
+    tasks-timeseries:
+      h: 6
+      w: 12
+      x: 12
+      "y": 5
   settings:
     defaultTimeframe:
       enabled: true
       value:
         from: now()-24h
         to: now()
-  layouts:
-    # Row 0: Header
-    "header":
-      x: 0
-      "y": 0
-      w: 24
-      h: 1
-    # Row 1: System KPIs
-    "heap-kpi":
-      x: 0
-      "y": 1
-      w: 8
-      h: 3
-    "tasks-kpi":
-      x: 8
-      "y": 1
-      w: 8
-      h: 3
-    "lan-errors-kpi":
-      x: 16
-      "y": 1
-      w: 8
-      h: 3
-    # Row 4: System resources
-    "system-header":
-      x: 0
-      "y": 4
-      w: 24
-      h: 1
-    "heap-timeseries":
-      x: 0
-      "y": 5
-      w: 12
-      h: 6
-    "tasks-timeseries":
-      x: 12
-      "y": 5
-      w: 12
-      h: 6
-    # Row 11: LAN
-    "lan-header":
-      x: 0
-      "y": 11
-      w: 24
-      h: 1
-    "lan-traffic":
-      x: 0
-      "y": 12
-      w: 12
-      h: 6
-    "lan-errors":
-      x: 12
-      "y": 12
-      w: 12
-      h: 6
-    # Row 18: CAN bus
-    "can-header":
-      x: 0
-      "y": 18
-      w: 24
-      h: 1
-    "can-traffic":
-      x: 0
-      "y": 19
-      w: 12
-      h: 6
-    "can-errors":
-      x: 12
-      "y": 19
-      w: 12
-      h: 6
   tiles:
-    "header":
-      content: "## 🖥️ Miniserver Health"
+    can-errors:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
+        timeseries {
+          receive_errors = avg(loxone.can.receive_errors),
+          frame_errors = avg(loxone.can.frame_errors),
+          overruns = avg(loxone.can.overruns)
+        }
+      title: CAN Bus Errors
+      type: data
+      visualization: lineChart
+      visualizationSettings:
+        autoSelectVisualization: false
+    can-header:
+      content: '### CAN Bus'
       type: markdown
-    "heap-kpi":
-      title: "Heap Memory"
+    can-traffic:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
+        timeseries {
+          sent = avg(loxone.can.packets_sent),
+          received = avg(loxone.can.packets_received)
+        }
+      title: CAN Packets (Sent / Received)
       type: data
-      query: >-
-        timeseries val = avg(loxone.system.heap_bytes)
-        | fieldsAdd last = arrayLast(val)
-        | fields last
+      visualization: areaChart
+      visualizationSettings:
+        autoSelectVisualization: false
+    header:
+      content: "## \U0001F5A5\uFE0F Miniserver Health"
+      type: markdown
+    heap-kpi:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: timeseries val = avg(loxone.system.heap_bytes) | fieldsAdd last = arrayLast(val) | fields last
+      title: Heap Memory
+      type: data
       visualization: singleValue
       visualizationSettings:
         autoSelectVisualization: false
         singleValue:
-          label: "bytes"
+          label: bytes
           recordField: last
           trend:
             isVisible: false
-        thresholds: []
+    heap-timeseries:
       davis:
-        enabled: false
         davisVisualization:
           isAvailable: true
-    "tasks-kpi":
-      title: "Active Tasks"
+        enabled: false
+      query: |-
+        timeseries {
+          heap_bytes = avg(loxone.system.heap_bytes),
+          heap = avg(loxone.system.heap)
+        }
+      title: Heap Memory Over Time
       type: data
-      query: >-
-        timeseries val = avg(loxone.system.tasks_count)
-        | fieldsAdd last = arrayLast(val)
-        | fields last
-      visualization: singleValue
+      visualization: lineChart
       visualizationSettings:
         autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          trend:
-            isVisible: false
-        thresholds: []
+    lan-errors:
       davis:
-        enabled: false
         davisVisualization:
           isAvailable: true
-    "lan-errors-kpi":
-      title: "LAN Errors (Total)"
+        enabled: false
+      query: |-
+        timeseries {
+          tx_errors = avg(loxone.lan.tx_errors),
+          tx_collisions = avg(loxone.lan.tx_collisions),
+          rx_overflow = avg(loxone.lan.rx_overflow),
+          eof_errors = avg(loxone.lan.eof_errors)
+        }
+      title: LAN Errors
       type: data
-      query: >-
+      visualization: lineChart
+      visualizationSettings:
+        autoSelectVisualization: false
+    lan-errors-kpi:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
         timeseries {
           tx_err = avg(loxone.lan.tx_errors),
           tx_coll = avg(loxone.lan.tx_collisions),
           rx_ovf = avg(loxone.lan.rx_overflow),
           eof = avg(loxone.lan.eof_errors)
-        }
-        | fieldsAdd total = arrayLast(tx_err) + arrayLast(tx_coll) + arrayLast(rx_ovf) + arrayLast(eof)
-        | fields total
+        } | fieldsAdd total = arrayLast(tx_err) + arrayLast(tx_coll) + arrayLast(rx_ovf) + arrayLast(eof) | fields total
+      title: LAN Errors (Total)
+      type: data
       visualization: singleValue
       visualizationSettings:
         autoSelectVisualization: false
@@ -153,133 +193,55 @@ content:
           - color: 'var(--dt-colors-charts-status-success-default, #2a7453)'
             isEnabled: true
             value: 0
-      davis:
-        enabled: false
-        davisVisualization:
-          isAvailable: true
-    "system-header":
-      content: "### System Resources"
+    lan-header:
+      content: '### LAN Interface'
       type: markdown
-    "heap-timeseries":
-      title: "Heap Memory Over Time"
-      type: data
-      query: >-
-        timeseries {
-          heap_bytes = avg(loxone.system.heap_bytes),
-          heap = avg(loxone.system.heap)
-        }
-      visualization: lineChart
-      visualizationSettings:
-        autoSelectVisualization: false
-        chartSettings:
-          legend:
-            hidden: false
-        thresholds: []
+    lan-traffic:
       davis:
-        enabled: false
         davisVisualization:
           isAvailable: true
-    "tasks-timeseries":
-      title: "Tasks Over Time"
-      type: data
-      query: >-
-        timeseries {
-          tasks_count = avg(loxone.system.tasks_count),
-          tasks = avg(loxone.system.tasks)
-        }
-      visualization: lineChart
-      visualizationSettings:
-        autoSelectVisualization: false
-        chartSettings:
-          legend:
-            hidden: false
-        thresholds: []
-      davis:
         enabled: false
-        davisVisualization:
-          isAvailable: true
-    "lan-header":
-      content: "### LAN Interface"
-      type: markdown
-    "lan-traffic":
-      title: "LAN Packets (RX / TX)"
-      type: data
-      query: >-
+      query: |-
         timeseries {
           rx = avg(loxone.lan.rx_packets),
           tx = avg(loxone.lan.tx_packets)
         }
+      title: LAN Packets (RX / TX)
+      type: data
       visualization: areaChart
       visualizationSettings:
         autoSelectVisualization: false
-        chartSettings:
-          legend:
-            hidden: false
-        thresholds: []
-      davis:
-        enabled: false
-        davisVisualization:
-          isAvailable: true
-    "lan-errors":
-      title: "LAN Errors"
-      type: data
-      query: >-
-        timeseries {
-          tx_errors = avg(loxone.lan.tx_errors),
-          tx_collisions = avg(loxone.lan.tx_collisions),
-          rx_overflow = avg(loxone.lan.rx_overflow),
-          eof_errors = avg(loxone.lan.eof_errors)
-        }
-      visualization: lineChart
-      visualizationSettings:
-        autoSelectVisualization: false
-        chartSettings:
-          legend:
-            hidden: false
-        thresholds: []
-      davis:
-        enabled: false
-        davisVisualization:
-          isAvailable: true
-    "can-header":
-      content: "### CAN Bus"
+    system-header:
+      content: '### System Resources'
       type: markdown
-    "can-traffic":
-      title: "CAN Packets (Sent / Received)"
-      type: data
-      query: >-
-        timeseries {
-          sent = avg(loxone.can.packets_sent),
-          received = avg(loxone.can.packets_received)
-        }
-      visualization: areaChart
-      visualizationSettings:
-        autoSelectVisualization: false
-        chartSettings:
-          legend:
-            hidden: false
-        thresholds: []
+    tasks-kpi:
       davis:
-        enabled: false
         davisVisualization:
           isAvailable: true
-    "can-errors":
-      title: "CAN Bus Errors"
+        enabled: false
+      query: timeseries val = avg(loxone.system.tasks_count) | fieldsAdd last = arrayLast(val) | fields last
+      title: Active Tasks
       type: data
-      query: >-
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          trend:
+            isVisible: false
+    tasks-timeseries:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
         timeseries {
-          receive_errors = avg(loxone.can.receive_errors),
-          frame_errors = avg(loxone.can.frame_errors),
-          overruns = avg(loxone.can.overruns)
+          tasks_count = avg(loxone.system.tasks_count),
+          tasks = avg(loxone.system.tasks)
         }
+      title: Tasks Over Time
+      type: data
       visualization: lineChart
       visualizationSettings:
         autoSelectVisualization: false
-        chartSettings:
-          legend:
-            hidden: false
-        thresholds: []
-      davis:
-        enabled: false
-        davisVisualization:
-          isAvailable: true
+  version: 21
