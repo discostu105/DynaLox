@@ -1,0 +1,286 @@
+id: "019dae61-d4d4-4d22-a329-7f8843709a65"
+name: "Loxone Lighting & Controls"
+type: dashboard
+content:
+  annotations: []
+  importedWithCode: false
+  settings:
+    defaultTimeframe:
+      enabled: true
+      value:
+        from: now()-24h
+        to: now()
+  layouts:
+    # Row 0: Header
+    "header":
+      x: 0
+      "y": 0
+      w: 24
+      h: 1
+    # Row 1: KPIs
+    "operating-mode":
+      x: 0
+      "y": 1
+      w: 8
+      h: 3
+    "sunrise":
+      x: 8
+      "y": 1
+      w: 8
+      h: 3
+    "sunset":
+      x: 16
+      "y": 1
+      w: 8
+      h: 3
+    # Row 4: Wohnzimmer lighting
+    "wz-header":
+      x: 0
+      "y": 4
+      w: 24
+      h: 1
+    "wz-power-timeseries":
+      x: 0
+      "y": 5
+      w: 16
+      h: 6
+    "wz-energy-today":
+      x: 16
+      "y": 5
+      w: 8
+      h: 6
+    # Row 11: All light meters
+    "meters-header":
+      x: 0
+      "y": 11
+      w: 24
+      h: 1
+    "light-energy-table":
+      x: 0
+      "y": 12
+      w: 12
+      h: 7
+    "light-energy-bar":
+      x: 12
+      "y": 12
+      w: 12
+      h: 7
+    # Row 19: Moods & switches
+    "controls-header":
+      x: 0
+      "y": 19
+      w: 24
+      h: 1
+    "active-moods":
+      x: 0
+      "y": 20
+      w: 12
+      h: 6
+    "switch-states":
+      x: 12
+      "y": 20
+      w: 12
+      h: 6
+  tiles:
+    "header":
+      content: "## 💡 Lighting & Controls"
+      type: markdown
+    "operating-mode":
+      title: "Operating Mode"
+      type: data
+      query: >-
+        timeseries val = avg(loxone.control.value),
+        filter: { control.name == "Global" AND state.name == "operatingMode" }
+        | fieldsAdd last = arrayLast(val)
+        | fields last
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          trend:
+            isVisible: false
+        thresholds: []
+      davis:
+        enabled: false
+        davisVisualization:
+          isAvailable: true
+    "sunrise":
+      title: "Sunrise"
+      type: data
+      query: >-
+        timeseries val = avg(loxone.control.value),
+        filter: { control.name == "Global" AND state.name == "sunrise" }
+        | fieldsAdd last = arrayLast(val)
+        | fields last
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          trend:
+            isVisible: false
+        thresholds: []
+      davis:
+        enabled: false
+        davisVisualization:
+          isAvailable: true
+    "sunset":
+      title: "Sunset"
+      type: data
+      query: >-
+        timeseries val = avg(loxone.control.value),
+        filter: { control.name == "Global" AND state.name == "sunset" }
+        | fieldsAdd last = arrayLast(val)
+        | fields last
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          trend:
+            isVisible: false
+        thresholds: []
+      davis:
+        enabled: false
+        davisVisualization:
+          isAvailable: true
+    "wz-header":
+      content: "### Wohnzimmer Lighting"
+      type: markdown
+    "wz-power-timeseries":
+      title: "Wohnzimmer Light Power (kW)"
+      type: data
+      query: >-
+        timeseries val = avg(loxone.control.value),
+        filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW"
+          AND (control.name == "Zähler Wohnzimmer Licht MItte"
+            OR control.name == "Zähler Wohnzimmer Licht Ost"
+            OR control.name == "Zähler Wohnzimmer Licht West"
+            OR control.name == "Zähler Wohnzimmer Lightstrip") },
+        by: { control.name }
+      visualization: lineChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          legend:
+            hidden: false
+        thresholds: []
+      davis:
+        enabled: false
+        davisVisualization:
+          isAvailable: true
+    "wz-energy-today":
+      title: "Wohnzimmer Energy Today"
+      type: data
+      query: >-
+        timeseries val = avg(loxone.control.value),
+        filter: { control.category == "Energie" AND state.name == "totalDay" AND unit == "kW"
+          AND (control.name == "Zähler Wohnzimmer Licht MItte"
+            OR control.name == "Zähler Wohnzimmer Licht Ost"
+            OR control.name == "Zähler Wohnzimmer Licht West"
+            OR control.name == "Zähler Wohnzimmer Lightstrip") },
+        by: { control.name }
+        | fieldsAdd latest = arrayLast(val)
+        | filter isNotNull(latest)
+        | fields control.name, latest
+      visualization: pieChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          circleChartSettings:
+            groupingThresholdType: relative
+            valueType: relative
+        thresholds: []
+      davis:
+        enabled: false
+        davisVisualization:
+          isAvailable: true
+    "meters-header":
+      content: "### All Light Meters"
+      type: markdown
+    "light-energy-table":
+      title: "Light Energy Today (all zones)"
+      type: data
+      query: >-
+        timeseries val = avg(loxone.control.value),
+        filter: { control.category == "Energie" AND state.name == "totalDay"
+          AND (contains(control.name, "Zähler Licht") OR contains(control.name, "Zähler Wohnzimmer Licht") OR contains(control.name, "Lightstrip")) },
+        by: { control.name, control.room }
+        | fieldsAdd today = arrayLast(val)
+        | filter isNotNull(today)
+        | fields control.name, control.room, today
+        | sort today desc
+      visualization: table
+      visualizationSettings:
+        autoSelectVisualization: false
+        thresholds: []
+      davis:
+        enabled: false
+        davisVisualization:
+          isAvailable: true
+    "light-energy-bar":
+      title: "Light Energy by Room"
+      type: data
+      query: >-
+        timeseries val = avg(loxone.control.value),
+        filter: { control.category == "Energie" AND state.name == "totalDay"
+          AND (contains(control.name, "Zähler Licht") OR contains(control.name, "Zähler Wohnzimmer Licht") OR contains(control.name, "Lightstrip")) },
+        by: { control.room }
+        | fieldsAdd today = arrayLast(val)
+        | filter isNotNull(today)
+        | fields control.room, today
+        | sort today desc
+      visualization: barChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          categoricalBarChartSettings:
+            categoryAxis: control.room
+            valueAxis: today
+          legend:
+            hidden: true
+        thresholds: []
+      davis:
+        enabled: false
+        davisVisualization:
+          isAvailable: true
+    "controls-header":
+      content: "### Lighting Moods & Switches"
+      type: markdown
+    "active-moods":
+      title: "Active Moods Over Time"
+      type: data
+      query: >-
+        timeseries val = avg(loxone.control.value),
+        filter: { control.category == "Beleuchtung" AND state.name == "activeMoodsNum" },
+        by: { control.name }
+      visualization: lineChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          legend:
+            hidden: false
+        thresholds: []
+      davis:
+        enabled: false
+        davisVisualization:
+          isAvailable: true
+    "switch-states":
+      title: "Switch States Over Time"
+      type: data
+      query: >-
+        timeseries val = avg(loxone.control.value),
+        filter: { control.category == "Beleuchtung" AND state.name == "active" },
+        by: { control.name }
+      visualization: lineChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          legend:
+            hidden: false
+        thresholds: []
+      davis:
+        enabled: false
+        davisVisualization:
+          isAvailable: true
