@@ -194,7 +194,7 @@ Light switch states, active moods, per-zone energy, operating mode.
 The dashboard YAML files in this repo were built iteratively using [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (Anthropic's AI coding agent) and deployed to Dynatrace via [`dtctl`](https://github.com/dynatrace-oss/dtctl). The workflow looked like this:
 
 1. 📤 **Export metrics** from the Loxone Miniserver using `lox otel serve` to push OpenTelemetry data into Dynatrace.
-2. 🧠 **Author dashboards as code** — Claude Code generated the Dynatrace dashboard YAML definitions (DQL queries, layouts, visualizations, thresholds) based on the available metric names and desired visualizations.
+2. 🧠 **Author dashboards as code** — the initial prompt to Claude Code was along the lines of: *"Explore Loxone-related metrics via DQL `metrics | filter service.name == "loxone-miniserver"`. Create useful dashboards and apply them via dtctl."* Claude Code then discovered the available metrics, designed DQL queries, and generated the dashboard YAML definitions (layouts, visualizations, thresholds).
 3. 🚀 **Deploy with `dtctl`** — `dtctl apply -f dashboards/*.yaml` pushes the dashboard definitions to the Dynatrace environment.
 4. 🔄 **Review and iterate** — screenshots of the live dashboards were fed back into Claude Code to identify visual and logical improvements (layout balance, threshold tuning, missing metrics, query fixes), which were then applied directly to the YAML files.
 

@@ -1,65 +1,12 @@
-id: d0321d6b-afa3-43ec-94bc-550b3b0a5984
-name: Loxone Miniserver Health
-type: dashboard
 content:
   annotations: []
   importedWithCode: false
   layouts:
-    header:
-      h: 2
-      w: 24
-      x: 0
-      "y": 0
-    heap-kpi:
-      h: 3
-      w: 6
-      x: 0
-      "y": 2
-    tasks-kpi:
-      h: 3
-      w: 6
-      x: 6
-      "y": 2
-    lan-errors-kpi:
-      h: 3
-      w: 6
-      x: 12
-      "y": 2
-    lan-packets-kpi:
-      h: 3
-      w: 6
-      x: 18
-      "y": 2
-    system-header:
-      h: 1
-      w: 24
-      x: 0
-      "y": 5
-    heap-timeseries:
-      h: 6
-      w: 12
-      x: 0
-      "y": 6
-    tasks-timeseries:
+    can-errors:
       h: 6
       w: 12
       x: 12
-      "y": 6
-    lan-header:
-      h: 1
-      w: 24
-      x: 0
-      "y": 12
-    lan-traffic:
-      h: 6
-      w: 12
-      x: 0
-      "y": 13
-    lan-errors:
-      h: 6
-      w: 12
-      x: 12
-      "y": 13
+      "y": 20
     can-header:
       h: 1
       w: 24
@@ -70,11 +17,61 @@ content:
       w: 12
       x: 0
       "y": 20
-    can-errors:
+    header:
+      h: 2
+      w: 24
+      x: 0
+      "y": 0
+    heap-kpi:
+      h: 3
+      w: 6
+      x: 0
+      "y": 2
+    heap-timeseries:
+      h: 6
+      w: 12
+      x: 0
+      "y": 6
+    lan-errors:
       h: 6
       w: 12
       x: 12
-      "y": 20
+      "y": 13
+    lan-errors-kpi:
+      h: 3
+      w: 6
+      x: 12
+      "y": 2
+    lan-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 12
+    lan-packets-kpi:
+      h: 3
+      w: 6
+      x: 18
+      "y": 2
+    lan-traffic:
+      h: 6
+      w: 12
+      x: 0
+      "y": 13
+    system-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 5
+    tasks-kpi:
+      h: 3
+      w: 6
+      x: 6
+      "y": 2
+    tasks-timeseries:
+      h: 6
+      w: 12
+      x: 12
+      "y": 6
   settings:
     defaultTimeframe:
       enabled: true
@@ -82,11 +79,136 @@ content:
         from: now()-24h
         to: now()
   tiles:
+    can-errors:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
+        timeseries {
+          receive_errors = avg(loxone.can.receive_errors),
+          frame_errors = avg(loxone.can.frame_errors),
+          overruns = avg(loxone.can.overruns)
+        }
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: CAN Bus Errors
+      type: data
+      visualization: lineChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          gapPolicy: connect
+          seriesOverrides:
+            - override:
+                color:
+                  Default: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+              seriesId:
+                - receive_errors
+            - override:
+                color:
+                  Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+              seriesId:
+                - frame_errors
+            - override:
+                color:
+                  Default: 'var(--dt-colors-charts-loglevel-alert-default, #c73d84)'
+              seriesId:
+                - overruns
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+              field: DT.name
+              type: string
+              value: receive_errors
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+              field: DT.name
+              type: string
+              value: frame_errors
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-loglevel-alert-default, #c73d84)'
+              field: DT.name
+              type: string
+              value: overruns
+    can-header:
+      content: "#### \U0001F50C CAN Bus"
+      type: markdown
+    can-traffic:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
+        timeseries {
+          sent = avg(loxone.can.packets_sent),
+          received = avg(loxone.can.packets_received)
+        }
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: CAN Packets (Sent / Received)
+      type: data
+      visualization: areaChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          gapPolicy: connect
+          seriesOverrides:
+            - override:
+                color:
+                  Default: 'var(--dt-colors-charts-categorical-color-01-default, #134fc9)'
+              seriesId:
+                - received
+            - override:
+                color:
+                  Default: 'var(--dt-colors-charts-categorical-color-11-default, #627cfe)'
+              seriesId:
+                - sent
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-01-default, #134fc9)'
+              field: DT.name
+              type: string
+              value: received
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-11-default, #627cfe)'
+              field: DT.name
+              type: string
+              value: sent
     header:
-      content: |-
-        <img src="https://www.loxone.com/int/wp-content/uploads/sites/21/2022/06/IG-Miniserver.png" height="100" />
-        ### 🖥️ Miniserver Health
-        System resources, LAN interface, and CAN bus diagnostics for the Loxone Miniserver.
+      content: "### \U0001F5A5️ Miniserver Health\nSystem resources, LAN interface, and CAN bus diagnostics for the Loxone Miniserver."
       type: markdown
     heap-kpi:
       davis:
@@ -94,6 +216,12 @@ content:
           isAvailable: true
         enabled: false
       query: timeseries val = avg(loxone.system.heap) | fieldsAdd last = arrayLast(val)
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Heap Memory
       type: data
       visualization: singleValue
@@ -117,84 +245,18 @@ content:
           - color: 'var(--dt-colors-charts-status-critical-default, #c62239)'
             isEnabled: true
             value: 0
-    tasks-kpi:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: timeseries val = avg(loxone.system.tasks) | fieldsAdd last = arrayLast(val)
-      title: Active Tasks
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          sparklineSettings:
-            color:
-              Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
-            isVisible: true
-          trend:
-            isVisible: false
-    lan-errors-kpi:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: |-
-        timeseries {
-          tx_err = avg(loxone.lan.tx_errors),
-          tx_coll = avg(loxone.lan.tx_collisions),
-          rx_ovf = avg(loxone.lan.rx_overflow),
-          eof = avg(loxone.lan.eof_errors)
-        } | fieldsAdd total = arrayLast(tx_err) + arrayLast(tx_coll) + arrayLast(rx_ovf) + arrayLast(eof) | fields total
-      title: LAN Errors (Total)
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          recordField: total
-          trend:
-            isVisible: false
-        thresholds:
-          - color: 'var(--dt-colors-charts-status-critical-default, #c62239)'
-            isEnabled: true
-            value: 100
-          - color: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
-            isEnabled: true
-            value: 10
-          - color: 'var(--dt-colors-charts-status-success-default, #2a7453)'
-            isEnabled: true
-            value: 0
-    lan-packets-kpi:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: |-
-        timeseries {
-          rx = avg(loxone.lan.rx_packets),
-          tx = avg(loxone.lan.tx_packets)
-        } | fieldsAdd total = arrayLast(rx) + arrayLast(tx) | fields total
-      title: LAN Packets (Total)
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          recordField: total
-          trend:
-            isVisible: false
-    system-header:
-      content: '#### 🧠 System Resources'
-      type: markdown
     heap-timeseries:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: timeseries heap = avg(loxone.system.heap)
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Heap Memory Over Time
       type: data
       visualization: areaChart
@@ -210,58 +272,21 @@ content:
                   Default: 'var(--dt-colors-charts-categorical-color-13-default, #006bba)'
               seriesId:
                 - heap
-    tasks-timeseries:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: timeseries tasks = avg(loxone.system.tasks)
-      title: Tasks Over Time
-      type: data
-      visualization: areaChart
-      visualizationSettings:
-        autoSelectVisualization: false
-        chartSettings:
-          gapPolicy: connect
-          legend:
-            hidden: true
-          seriesOverrides:
-            - override:
-                color:
-                  Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
-              seriesId:
-                - tasks
-    lan-header:
-      content: '#### 🌐 LAN Interface'
-      type: markdown
-    lan-traffic:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: |-
-        timeseries {
-          rx = avg(loxone.lan.rx_packets),
-          tx = avg(loxone.lan.tx_packets)
-        }
-      title: LAN Packets (RX / TX)
-      type: data
-      visualization: areaChart
-      visualizationSettings:
-        autoSelectVisualization: false
-        chartSettings:
-          gapPolicy: connect
-          seriesOverrides:
-            - override:
-                color:
-                  Default: 'var(--dt-colors-charts-categorical-color-01-default, #134fc9)'
-              seriesId:
-                - rx
-            - override:
-                color:
-                  Default: 'var(--dt-colors-charts-categorical-color-11-default, #627cfe)'
-              seriesId:
-                - tx
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-13-default, #006bba)'
+              field: DT.name
+              type: string
+              value: heap
     lan-errors:
       davis:
         davisVisualization:
@@ -274,6 +299,12 @@ content:
           rx_overflow = avg(loxone.lan.rx_overflow),
           eof_errors = avg(loxone.lan.eof_errors)
         }
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: LAN Errors
       type: data
       visualization: lineChart
@@ -302,20 +333,124 @@ content:
                   Default: 'var(--dt-colors-charts-categorical-color-04-default, #d85a9f)'
               seriesId:
                 - eof_errors
-    can-header:
-      content: '#### 🔌 CAN Bus'
-      type: markdown
-    can-traffic:
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+              field: DT.name
+              type: string
+              value: tx_errors
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+              field: DT.name
+              type: string
+              value: tx_collisions
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-loglevel-alert-default, #c73d84)'
+              field: DT.name
+              type: string
+              value: rx_overflow
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-04-default, #d85a9f)'
+              field: DT.name
+              type: string
+              value: eof_errors
+    lan-errors-kpi:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: |-
         timeseries {
-          sent = avg(loxone.can.packets_sent),
-          received = avg(loxone.can.packets_received)
+          tx_err = avg(loxone.lan.tx_errors),
+          tx_coll = avg(loxone.lan.tx_collisions),
+          rx_ovf = avg(loxone.lan.rx_overflow),
+          eof = avg(loxone.lan.eof_errors)
+        } | fieldsAdd total = arrayLast(tx_err) + arrayLast(tx_coll) + arrayLast(rx_ovf) + arrayLast(eof) | fields total
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: LAN Errors (Total)
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: total
+          trend:
+            isVisible: false
+        thresholds:
+          - color: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+            isEnabled: true
+            value: 100
+          - color: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+            isEnabled: true
+            value: 10
+          - color: 'var(--dt-colors-charts-status-success-default, #2a7453)'
+            isEnabled: true
+            value: 0
+    lan-header:
+      content: "#### \U0001F310 LAN Interface"
+      type: markdown
+    lan-packets-kpi:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
+        timeseries {
+          rx = avg(loxone.lan.rx_packets),
+          tx = avg(loxone.lan.tx_packets)
+        } | fieldsAdd total = arrayLast(rx) + arrayLast(tx) | fields total
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: LAN Packets (Total)
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: total
+          trend:
+            isVisible: false
+    lan-traffic:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
+        timeseries {
+          rx = avg(loxone.lan.rx_packets),
+          tx = avg(loxone.lan.tx_packets)
         }
-      title: CAN Packets (Sent / Received)
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: LAN Packets (RX / TX)
       type: data
       visualization: areaChart
       visualizationSettings:
@@ -327,44 +462,111 @@ content:
                 color:
                   Default: 'var(--dt-colors-charts-categorical-color-01-default, #134fc9)'
               seriesId:
-                - received
+                - rx
             - override:
                 color:
                   Default: 'var(--dt-colors-charts-categorical-color-11-default, #627cfe)'
               seriesId:
-                - sent
-    can-errors:
+                - tx
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-01-default, #134fc9)'
+              field: DT.name
+              type: string
+              value: rx
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-11-default, #627cfe)'
+              field: DT.name
+              type: string
+              value: tx
+    system-header:
+      content: "#### \U0001F9E0 System Resources"
+      type: markdown
+    tasks-kpi:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
-      query: |-
-        timeseries {
-          receive_errors = avg(loxone.can.receive_errors),
-          frame_errors = avg(loxone.can.frame_errors),
-          overruns = avg(loxone.can.overruns)
-        }
-      title: CAN Bus Errors
+      query: timeseries val = avg(loxone.system.tasks) | fieldsAdd last = arrayLast(val)
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Active Tasks
       type: data
-      visualization: lineChart
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
+          trend:
+            isVisible: false
+    tasks-timeseries:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: timeseries tasks = avg(loxone.system.tasks)
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Tasks Over Time
+      type: data
+      visualization: areaChart
       visualizationSettings:
         autoSelectVisualization: false
         chartSettings:
           gapPolicy: connect
+          legend:
+            hidden: true
           seriesOverrides:
             - override:
                 color:
-                  Default: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+                  Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
               seriesId:
-                - receive_errors
-            - override:
-                color:
-                  Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
-              seriesId:
-                - frame_errors
-            - override:
-                color:
-                  Default: 'var(--dt-colors-charts-loglevel-alert-default, #c73d84)'
-              seriesId:
-                - overruns
+                - tasks
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
+              field: DT.name
+              type: string
+              value: tasks
+  variables: []
   version: 21
+id: d0321d6b-afa3-43ec-94bc-550b3b0a5984
+isPrivate: true
+modificationInfo:
+  createdTime: 2026-03-14T23:45:18.619Z
+  lastModifiedTime: 2026-03-15T14:32:58.914Z
+name: Loxone Miniserver Health
+owner: d59ed854-7fea-4098-b54b-bda92acd9ac2
+type: dashboard
+version: 12

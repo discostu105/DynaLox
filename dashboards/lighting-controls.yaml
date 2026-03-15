@@ -1,6 +1,3 @@
-id: 019dae61-d4d4-4d22-a329-7f8843709a65
-name: Loxone Lighting & Controls
-type: dashboard
 content:
   annotations: []
   importedWithCode: false
@@ -10,6 +7,46 @@ content:
       w: 24
       x: 0
       "y": 0
+    light-energy-table:
+      h: 7
+      w: 8
+      x: 16
+      "y": 6
+    light-energy-timeseries:
+      h: 7
+      w: 16
+      x: 0
+      "y": 6
+    meters-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 5
+    motion-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 13
+    motion-oben:
+      h: 3
+      w: 4
+      x: 16
+      "y": 2
+    motion-timeseries:
+      h: 6
+      w: 24
+      x: 0
+      "y": 14
+    motion-unten:
+      h: 3
+      w: 4
+      x: 20
+      "y": 2
+    motion-vorraum:
+      h: 3
+      w: 4
+      x: 12
+      "y": 2
     vorraum-kpi:
       h: 3
       w: 6
@@ -20,46 +57,11 @@ content:
       w: 6
       x: 6
       "y": 2
-    motion-vorraum:
-      h: 3
-      w: 4
-      x: 12
-      "y": 2
-    motion-oben:
-      h: 3
-      w: 4
-      x: 16
-      "y": 2
-    motion-unten:
-      h: 3
-      w: 4
-      x: 20
-      "y": 2
-    meters-header:
-      h: 1
-      w: 24
-      x: 0
-      "y": 5
-    light-energy-timeseries:
-      h: 7
-      w: 16
-      x: 0
-      "y": 6
-    light-energy-table:
-      h: 7
-      w: 8
-      x: 16
-      "y": 6
-    motion-header:
-      h: 1
-      w: 24
-      x: 0
-      "y": 13
-    motion-timeseries:
+    zone-daily-energy:
       h: 6
-      w: 24
-      x: 0
-      "y": 14
+      w: 12
+      x: 12
+      "y": 21
     zone-header:
       h: 1
       w: 24
@@ -70,11 +72,6 @@ content:
       w: 12
       x: 0
       "y": 21
-    zone-daily-energy:
-      h: 6
-      w: 12
-      x: 12
-      "y": 21
   settings:
     defaultTimeframe:
       enabled: true
@@ -83,133 +80,8 @@ content:
         to: now()
   tiles:
     header:
-      content: |-
-        <img src="https://www.loxone.com/int/wp-content/uploads/sites/21/2022/06/IG-Miniserver.png" height="100" />
-        ### 💡 Lighting & Controls
-        Light energy metering, motion sensor activity, and presence detection across the house.
+      content: "### \U0001F4A1 Lighting & Controls\nLight energy metering, motion sensor activity, and presence detection across the house."
       type: markdown
-    vorraum-kpi:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = sum(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW" AND contains(control.name, "Licht") } | fieldsAdd last = arrayLast(val)'
-      title: Total Light Power
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          sparklineSettings:
-            color:
-              Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
-            isVisible: true
-          trend:
-            isVisible: false
-        unitsOverrides:
-          - baseUnit: kilo-watt
-            identifier: last
-            unitCategory: power
-    vorraum-today-kpi:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = sum(loxone.control.value), filter: { control.category == "Energie" AND state.name == "totalDay" AND unit == "kW" AND contains(control.name, "Licht") } | fieldsAdd last = arrayLast(val)'
-      title: Light Energy Today
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          label: kWh
-          recordField: last
-          sparklineSettings:
-            color:
-              Default: 'var(--dt-colors-charts-categorical-color-13-default, #006bba)'
-            isVisible: true
-          trend:
-            isVisible: false
-    motion-vorraum:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Bewegung" AND state.name == "active" } | fieldsAdd last = arrayLast(val)'
-      title: Vorraum Motion
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          sparklineSettings:
-            color:
-              Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
-            isVisible: true
-            variant: bar
-          trend:
-            isVisible: false
-    motion-oben:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "gang_sensor_oben_motion" AND state.name == "active" } | fieldsAdd last = arrayLast(val)'
-      title: Stairs Up
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          sparklineSettings:
-            color:
-              Default: 'var(--dt-colors-charts-categorical-color-11-default, #627cfe)'
-            isVisible: true
-            variant: bar
-          trend:
-            isVisible: false
-    motion-unten:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "gang_sensor_unten_motion" AND state.name == "active" } | fieldsAdd last = arrayLast(val)'
-      title: Stairs Down
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          sparklineSettings:
-            color:
-              Default: 'var(--dt-colors-charts-categorical-color-15-default, #9033a3)'
-            isVisible: true
-            variant: bar
-          trend:
-            isVisible: false
-    meters-header:
-      content: '#### ⚡ Light Energy Meters'
-      type: markdown
-    light-energy-timeseries:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: |-
-        timeseries val = avg(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW"
-          AND contains(control.name, "Licht") },
-        by: { control.name }
-      title: Light Power Over Time (kW)
-      type: data
-      visualization: areaChart
-      visualizationSettings:
-        autoSelectVisualization: false
-        chartSettings:
-          gapPolicy: connect
     light-energy-table:
       davis:
         davisVisualization:
@@ -225,20 +97,82 @@ content:
         | fieldsAdd metric = if(state.name == "actual", "Current Power", else: if(state.name == "totalDay", "Today", else: "This Month"))
         | fields control.name, control.room, metric, latest
         | sort control.name, metric
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Light Meter Details
       type: data
       visualization: table
       visualizationSettings:
         autoSelectVisualization: false
-    motion-header:
-      content: '#### 👋 Motion & Presence'
+    light-energy-timeseries:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
+        timeseries val = avg(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW"
+          AND contains(control.name, "Licht") },
+        by: { control.name }
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Light Power Over Time (kW)
+      type: data
+      visualization: areaChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          gapPolicy: connect
+    meters-header:
+      content: '#### ⚡ Light Energy Meters'
       type: markdown
+    motion-header:
+      content: "#### \U0001F44B Motion & Presence"
+      type: markdown
+    motion-oben:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "gang_sensor_oben_motion" AND state.name == "active" } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Stairs Up
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-categorical-color-11-default, #627cfe)'
+            variant: bar
+          trend:
+            isVisible: false
     motion-timeseries:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: 'timeseries val = avg(loxone.control.value), filter: { control.category == "Präsenzerkennung" AND state.name == "active" }, by: { control.name }'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Motion Sensor Activity
       type: data
       visualization: areaChart
@@ -262,28 +196,142 @@ content:
                   Default: 'var(--dt-colors-charts-categorical-color-15-default, #9033a3)'
               seriesId:
                 - gang_sensor_unten_motion
-    zone-header:
-      content: '#### 🏠 Per-Zone Light Energy'
-      type: markdown
-    zone-honeycomb:
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
+              field: DT.name
+              type: string
+              value: Bewegung
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-11-default, #627cfe)'
+              field: DT.name
+              type: string
+              value: gang_sensor_oben_motion
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-15-default, #9033a3)'
+              field: DT.name
+              type: string
+              value: gang_sensor_unten_motion
+    motion-unten:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW" AND contains(control.name, "Licht") }, by: { control.name } | fieldsAdd current = arrayLast(val) | filter isNotNull(current) AND current > 0 | fields control.name, current | sort current desc'
-      title: Current Light Power by Zone
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "gang_sensor_unten_motion" AND state.name == "active" } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Stairs Down
       type: data
-      visualization: honeycomb
+      visualization: singleValue
       visualizationSettings:
         autoSelectVisualization: false
-        honeycomb:
-          colorPalette: yellow-green
-          dataMappings:
-            value: current
-          displayedFields:
-            - control.name
-          legend:
-            hidden: true
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-categorical-color-15-default, #9033a3)'
+            variant: bar
+          trend:
+            isVisible: false
+    motion-vorraum:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Bewegung" AND state.name == "active" } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Vorraum Motion
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
+            variant: bar
+          trend:
+            isVisible: false
+    vorraum-kpi:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = sum(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW" AND contains(control.name, "Licht") } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Total Light Power
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+          trend:
+            isVisible: false
+        unitsOverrides:
+          - added: 1.773585142682e+12
+            baseUnit: kilo-watt
+            decimals: null
+            delimiter: false
+            identifier: last
+            suffix: ""
+            unitCategory: power
+    vorraum-today-kpi:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = sum(loxone.control.value), filter: { control.category == "Energie" AND state.name == "totalDay" AND unit == "kW" AND contains(control.name, "Licht") } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Light Energy Today
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          label: kWh
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-categorical-color-13-default, #006bba)'
+          trend:
+            isVisible: false
     zone-daily-energy:
       davis:
         davisVisualization:
@@ -297,13 +345,56 @@ content:
         | filter isNotNull(latest) AND latest > 0
         | fields control.name, latest
         | sort latest desc
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Daily Energy by Zone (kWh)
       type: data
-      visualization: barChart
+      visualization: pieChart
       visualizationSettings:
         autoSelectVisualization: false
         chartSettings:
           legend:
             hidden: true
+    zone-header:
+      content: "#### \U0001F3E0 Per-Zone Light Energy"
+      type: markdown
+    zone-honeycomb:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW" AND contains(control.name, "Licht") }, by: { control.name } | fieldsAdd current = arrayLast(val) | filter isNotNull(current) AND current > 0 | fields control.name, current | sort current desc'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Current Light Power by Zone
+      type: data
+      visualization: honeycomb
+      visualizationSettings:
+        autoSelectVisualization: false
+        honeycomb:
+          colorPalette: yellow-green
+          dataMappings:
+            value: current
+          displayedFields:
+            - control.name
+          legend:
+            hidden: true
   variables: []
   version: 21
+id: 019dae61-d4d4-4d22-a329-7f8843709a65
+isPrivate: true
+modificationInfo:
+  createdTime: 2026-03-14T23:45:19.223Z
+  lastModifiedTime: 2026-03-15T14:34:08.085Z
+name: Loxone Lighting & Controls
+owner: d59ed854-7fea-4098-b54b-bda92acd9ac2
+type: dashboard
+version: 27

@@ -1,40 +1,7 @@
-id: 3f8f5e42-3bc5-4340-9b24-e94f97f2e012
-name: Loxone Energy Overview
-type: dashboard
 content:
   annotations: []
   importedWithCode: false
   layouts:
-    header:
-      h: 2
-      w: 24
-      x: 0
-      "y": 0
-    consumption-now:
-      h: 3
-      w: 4
-      x: 0
-      "y": 2
-    grid-now:
-      h: 3
-      w: 4
-      x: 4
-      "y": 2
-    pv-now:
-      h: 3
-      w: 3
-      x: 8
-      "y": 2
-    self-consumption:
-      h: 3
-      w: 3
-      x: 11
-      "y": 2
-    heating-now:
-      h: 3
-      w: 4
-      x: 14
-      "y": 2
     battery-now:
       h: 3
       w: 3
@@ -44,6 +11,51 @@ content:
       h: 3
       w: 3
       x: 21
+      "y": 2
+    consumer-honeycomb:
+      h: 6
+      w: 12
+      x: 0
+      "y": 20
+    consumer-table:
+      h: 6
+      w: 12
+      x: 12
+      "y": 20
+    consumers-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 19
+    consumption-now:
+      h: 3
+      w: 4
+      x: 0
+      "y": 2
+    flow-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 13
+    grid-now:
+      h: 3
+      w: 4
+      x: 4
+      "y": 2
+    grid-power:
+      h: 5
+      w: 8
+      x: 0
+      "y": 14
+    header:
+      h: 2
+      w: 24
+      x: 0
+      "y": 0
+    heating-now:
+      h: 3
+      w: 4
+      x: 14
       "y": 2
     power-header:
       h: 1
@@ -55,16 +67,16 @@ content:
       w: 24
       x: 0
       "y": 6
-    flow-header:
-      h: 1
-      w: 24
-      x: 0
-      "y": 13
-    grid-power:
-      h: 5
-      w: 8
-      x: 0
-      "y": 14
+    pv-now:
+      h: 3
+      w: 3
+      x: 8
+      "y": 2
+    self-consumption:
+      h: 3
+      w: 3
+      x: 11
+      "y": 2
     solar-power:
       h: 5
       w: 8
@@ -75,21 +87,6 @@ content:
       w: 8
       x: 16
       "y": 14
-    consumers-header:
-      h: 1
-      w: 24
-      x: 0
-      "y": 19
-    consumer-honeycomb:
-      h: 6
-      w: 12
-      x: 0
-      "y": 20
-    consumer-table:
-      h: 6
-      w: 12
-      x: 12
-      "y": 20
   settings:
     defaultTimeframe:
       enabled: true
@@ -97,11 +94,127 @@ content:
         from: now()-24h
         to: now()
   tiles:
-    header:
-      content: |-
-        <img src="https://www.loxone.com/int/wp-content/uploads/sites/21/2022/06/IG-Miniserver.png" height="100" />
-        ### ⚡ Energy Overview
-        Real-time power consumption, solar production, battery storage, and per-consumer breakdown.
+    battery-now:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Speicher" AND state.name == "actual" AND unit == "kW" } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Battery Power
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
+          trend:
+            isVisible: false
+        unitsOverrides:
+          - added: 1.773585189257e+12
+            baseUnit: kilo-watt
+            decimals: null
+            delimiter: false
+            identifier: last
+            suffix: ""
+            unitCategory: power
+    battery-soc:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Speicher" AND state.name == "storage" } | fieldsAdd last = arrayLast(val) | fields last'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Battery SoC
+      type: data
+      visualization: gauge
+      visualizationSettings:
+        autoSelectVisualization: false
+        valueBoundaries:
+          max:
+            mode: custom
+            value: 100
+    consumer-honeycomb:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW" AND control.type == "Meter" }, by: { control.name } | fieldsAdd current_kW = arrayLast(val) | filter isNotNull(current_kW) AND current_kW > 0 | fields control.name, current_kW | sort current_kW desc'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Active Consumers
+      type: data
+      visualization: honeycomb
+      visualizationSettings:
+        autoSelectVisualization: false
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: blue
+              comparator: = *value*
+              field: current_kW
+              type: string
+              value: ""
+        honeycomb:
+          colorPalette: blue
+          dataMappings:
+            value: current_kW
+          displayedFields:
+            - control.name
+          legend:
+            hidden: true
+    consumer-table:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
+        timeseries val = avg(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW" AND control.type == "Meter" }, by: { control.name }
+        | fieldsAdd current_kW = arrayLast(val)
+        | filter isNotNull(current_kW) AND current_kW > 0
+        | fields control.name, current_kW, val, timeframe, interval
+        | sort current_kW desc
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Consumer Details
+      type: data
+      visualization: table
+      visualizationSettings:
+        autoSelectVisualization: false
+        table:
+          columnTypeOverrides:
+            - disableRemoval: false
+              fields:
+                - val
+              id: 1.773585280996e+12
+              value: sparkline
+          columnWidths:
+            '["control.name"]': 200
+            '["current_kW"]': 100
+            '["val"]': 300
+    consumers-header:
+      content: "#### \U0001F3F7️ Per-Consumer Breakdown"
       type: markdown
     consumption-now:
       davis:
@@ -109,6 +222,12 @@ content:
           isAvailable: true
         enabled: false
       query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Stromverbrauch" AND state.name == "actual" AND unit == "kW" } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Total Consumption
       type: data
       visualization: singleValue
@@ -134,12 +253,21 @@ content:
           - baseUnit: kilo-watt
             identifier: last
             unitCategory: power
+    flow-header:
+      content: "#### \U0001F504 Energy Flow"
+      type: markdown
     grid-now:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Netzbezug" AND state.name == "actual" AND unit == "kW" } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Grid Draw
       type: data
       visualization: singleValue
@@ -165,45 +293,65 @@ content:
           - baseUnit: kilo-watt
             identifier: last
             unitCategory: power
-    pv-now:
+    grid-power:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "PV-Strom" AND state.name == "actual" AND unit == "kW" } | fieldsAdd last = arrayLast(val)'
-      title: PV Production
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Energiefluss" AND state.name == "Gpwr" AND unit == "kW" }'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Grid Power (Gpwr)
       type: data
-      visualization: singleValue
+      visualization: areaChart
       visualizationSettings:
         autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          sparklineSettings:
-            color:
-              Default: 'var(--dt-colors-charts-status-success-default, #2a7453)'
-            isVisible: true
-          trend:
-            isVisible: false
-        thresholds:
-          - color: 'var(--dt-colors-charts-status-success-default, #2a7453)'
-            isEnabled: true
-            value: 3
-          - color: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
-            isEnabled: true
-            value: 1
-          - color: 'var(--dt-colors-charts-status-critical-default, #c62239)'
-            isEnabled: true
-            value: 0
-        unitsOverrides:
-          - baseUnit: kilo-watt
-            identifier: last
-            unitCategory: power
+        chartSettings:
+          gapPolicy: connect
+          legend:
+            hidden: true
+          seriesOverrides:
+            - override:
+                color:
+                  Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+              seriesId:
+                - val
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+              field: DT.name
+              type: string
+              value: val
+    header:
+      content: |-
+        ### ⚡ Energy Overview
+        Real-time power consumption, solar production, battery storage, and per-consumer breakdown.
+      type: markdown
     heating-now:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Heizung" AND state.name == "actual" AND unit == "kW" } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Heating
       type: data
       visualization: singleValue
@@ -214,78 +362,18 @@ content:
           sparklineSettings:
             color:
               Default: 'var(--dt-colors-charts-status-critical-default, #c62239)'
-            isVisible: true
           trend:
             isVisible: false
         unitsOverrides:
-          - baseUnit: kilo-watt
+          - added: 1.773585189258e+12
+            baseUnit: kilo-watt
+            decimals: null
+            delimiter: false
             identifier: last
+            suffix: ""
             unitCategory: power
-    battery-now:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Speicher" AND state.name == "actual" AND unit == "kW" } | fieldsAdd last = arrayLast(val)'
-      title: Battery Power
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          sparklineSettings:
-            color:
-              Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
-            isVisible: true
-          trend:
-            isVisible: false
-        unitsOverrides:
-          - baseUnit: kilo-watt
-            identifier: last
-            unitCategory: power
-    battery-soc:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Speicher" AND state.name == "storage" } | fieldsAdd last = arrayLast(val) | fields last'
-      title: Battery SoC
-      type: data
-      visualization: gauge
-      visualizationSettings:
-        autoSelectVisualization: false
-        colorModeType:
-          numericColorPalette: blue
-        valueBoundaries:
-          max:
-            mode: custom
-            value: 100
-    self-consumption:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: |-
-        timeseries {
-          consumption = avg(loxone.control.value, filter: { control.name == "Stromverbrauch" AND state.name == "actual" AND unit == "kW" }),
-          grid = avg(loxone.control.value, filter: { control.name == "Netzbezug" AND state.name == "actual" AND unit == "kW" })
-        }
-        | fieldsAdd rate = (1.0 - arrayLast(grid) / arrayLast(consumption)) * 100
-        | fields rate
-      title: Self-Consumption
-      type: data
-      visualization: gauge
-      visualizationSettings:
-        autoSelectVisualization: false
-        colorModeType:
-          numericColorPalette: green
-        valueBoundaries:
-          max:
-            mode: custom
-            value: 100
     power-header:
-      content: '#### 📈 Power Over Time'
+      content: "#### \U0001F4C8 Power Over Time"
       type: markdown
     power-timeseries:
       davis:
@@ -300,6 +388,12 @@ content:
           heating = avg(loxone.control.value, filter: { control.name == "Heizung" AND state.name == "actual" AND unit == "kW" }),
           battery = avg(loxone.control.value, filter: { control.name == "Speicher" AND state.name == "actual" AND unit == "kW" })
         }
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Power (kW)
       type: data
       visualization: areaChart
@@ -333,36 +427,127 @@ content:
                   Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
               seriesId:
                 - battery
-    flow-header:
-      content: '#### 🔄 Energy Flow'
-      type: markdown
-    grid-power:
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-13-default, #006bba)'
+              field: DT.name
+              type: string
+              value: consumption
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+              field: DT.name
+              type: string
+              value: grid
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-status-success-default, #2a7453)'
+              field: DT.name
+              type: string
+              value: pv
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+              field: DT.name
+              type: string
+              value: heating
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
+              field: DT.name
+              type: string
+              value: battery
+    pv-now:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Energiefluss" AND state.name == "Gpwr" AND unit == "kW" }'
-      title: Grid Power (Gpwr)
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "PV-Strom" AND state.name == "actual" AND unit == "kW" } | fieldsAdd last = arrayLast(val)'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: PV Production
       type: data
-      visualization: areaChart
+      visualization: singleValue
       visualizationSettings:
         autoSelectVisualization: false
-        chartSettings:
-          gapPolicy: connect
-          legend:
-            hidden: true
-          seriesOverrides:
-            - override:
-                color:
-                  Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
-              seriesId:
-                - val
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-status-success-default, #2a7453)'
+            isVisible: true
+          trend:
+            isVisible: false
+        thresholds:
+          - color: 'var(--dt-colors-charts-status-success-default, #2a7453)'
+            isEnabled: true
+            value: 3
+          - color: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+            isEnabled: true
+            value: 1
+          - color: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+            isEnabled: true
+            value: 0
+        unitsOverrides:
+          - baseUnit: kilo-watt
+            identifier: last
+            unitCategory: power
+    self-consumption:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: |-
+        timeseries {
+          consumption = avg(loxone.control.value, filter: { control.name == "Stromverbrauch" AND state.name == "actual" AND unit == "kW" }),
+          grid = avg(loxone.control.value, filter: { control.name == "Netzbezug" AND state.name == "actual" AND unit == "kW" })
+        }
+        | fieldsAdd rate = (1.0 - arrayLast(grid) / arrayLast(consumption)) * 100
+        | fields rate
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
+      title: Self-Consumption
+      type: data
+      visualization: gauge
+      visualizationSettings:
+        autoSelectVisualization: false
+        valueBoundaries:
+          max:
+            mode: custom
+            value: 100
     solar-power:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Energiefluss" AND state.name == "Ppwr" }'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: PV Production (Ppwr)
       type: data
       visualization: areaChart
@@ -378,12 +563,33 @@ content:
                   Default: 'var(--dt-colors-charts-status-success-default, #2a7453)'
               seriesId:
                 - val
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-status-success-default, #2a7453)'
+              field: DT.name
+              type: string
+              value: val
     storage-power:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Energiefluss" AND state.name == "Spwr" AND unit == "kW" }'
+      querySettings:
+        defaultSamplingRatio: 10
+        defaultScanLimitGbytes: 500
+        enableSampling: false
+        maxResultMegaBytes: 1
+        maxResultRecords: 1000
       title: Storage Power (Spwr)
       type: data
       visualization: areaChart
@@ -399,51 +605,29 @@ content:
                   Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
               seriesId:
                 - val
-    consumers-header:
-      content: '#### 🏷️ Per-Consumer Breakdown'
-      type: markdown
-    consumer-honeycomb:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW" AND control.type == "Meter" }, by: { control.name } | fieldsAdd current_kW = arrayLast(val) | filter isNotNull(current_kW) AND current_kW > 0 | fields control.name, current_kW | sort current_kW desc'
-      title: Active Consumers
-      type: data
-      visualization: honeycomb
-      visualizationSettings:
-        autoSelectVisualization: false
-        honeycomb:
-          colorPalette: blue
-          dataMappings:
-            value: current_kW
-          displayedFields:
-            - control.name
-          legend:
-            hidden: true
-    consumer-table:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: |-
-        timeseries val = avg(loxone.control.value), filter: { control.category == "Energie" AND state.name == "actual" AND unit == "kW" AND control.type == "Meter" }, by: { control.name }
-        | fieldsAdd current_kW = arrayLast(val)
-        | filter isNotNull(current_kW) AND current_kW > 0
-        | fields control.name, current_kW, val
-        | sort current_kW desc
-      title: Consumer Details
-      type: data
-      visualization: table
-      visualizationSettings:
-        autoSelectVisualization: false
-        table:
-          columnTypeOverrides:
-            - fields:
-                - val
-              value: sparkline
-          columnWidths:
-            '["control.name"]': 200
-            '["current_kW"]': 100
-            '["val"]': 300
+        coloring:
+          colorRules:
+            - colorMode: color-palette
+              colorPalette: categorical
+              comparator: = *value*
+              field: DT.name
+              type: string
+              value: ""
+            - colorMode: custom-color
+              comparator: =
+              customColor:
+                Default: 'var(--dt-colors-charts-categorical-color-08-default, #8b6ecf)'
+              field: DT.name
+              type: string
+              value: val
+  variables: []
   version: 21
+id: 3f8f5e42-3bc5-4340-9b24-e94f97f2e012
+isPrivate: true
+modificationInfo:
+  createdTime: 2026-03-14T23:45:17.298Z
+  lastModifiedTime: 2026-03-15T14:34:44.187Z
+name: Loxone Energy Overview
+owner: d59ed854-7fea-4098-b54b-bda92acd9ac2
+type: dashboard
+version: 31
