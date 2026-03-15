@@ -200,6 +200,10 @@ The dashboard YAML files in this repo were built iteratively using [Claude Code]
 
 This "dashboards as code" approach makes the dashboards version-controlled, reproducible, and easy to share or adapt for other Loxone setups. ✨
 
+## Disclaimer
+
+These dashboards are just a proof of concept. They are tailored to my specific environment. They are not perfect yet.
+
 ## 📄 License
 
 Apache 2.0
