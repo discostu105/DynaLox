@@ -1,12 +1,16 @@
-# DynaLox
+# 🏠 DynaLox
 
 Ready-made Dynatrace dashboards for Loxone Miniserver metrics, exported via [`lox otel`](https://github.com/discostu105/lox).
 
-This is an experiment combining the OpenTelemetry export capabilities of the [`lox` CLI](https://github.com/discostu105/lox) with Dynatrace dashboards for smart home observability.
+<p align="center">
+  <img src="https://www.loxone.com/int/wp-content/uploads/sites/21/2022/06/IG-Miniserver.png" alt="Loxone Miniserver" width="300"/>
+</p>
 
-## Setup
+This is an experiment combining the OpenTelemetry export capabilities of the [`lox` CLI](https://github.com/discostu105/lox) with Dynatrace dashboards for smart home observability. 📊
 
-### Option 1: CLI
+## ⚡ Setup
+
+### 🖥️ Option 1: CLI
 
 1. Install [`lox`](https://github.com/discostu105/lox) and configure it for your Miniserver.
 
@@ -19,7 +23,7 @@ lox otel serve --interval 10s \
   --delta
 ```
 
-### Option 2: Docker
+### 🐳 Option 2: Docker
 
 The `lox` CLI is available as a Docker image at `ghcr.io/discostu105/lox`.
 
@@ -45,7 +49,7 @@ docker run -d --name lox-otel \
     --delta
 ```
 
-### Option 3: Kubernetes
+### ☸️ Option 3: Kubernetes
 
 1. Create a Secret for the `lox` config (Miniserver connection):
 
@@ -148,7 +152,7 @@ kubectl apply -f lox-otel-secret.yaml
 kubectl apply -f lox-otel-deployment.yaml
 ```
 
-### Deploy Dashboards
+### 🚀 Deploy Dashboards
 
 Deploy the dashboards to your Dynatrace environment using [`dtctl`](https://github.com/dynatrace-oss/dtctl):
 
@@ -159,26 +163,43 @@ dtctl apply -f dashboards/miniserver-health.yaml
 dtctl apply -f dashboards/lighting-controls.yaml
 ```
 
-## Dashboards
+## 📊 Dashboards
 
-| Dashboard | Description |
-|-----------|-------------|
-| **Energy Overview** | Power consumption, grid draw, PV production, battery storage, self-consumption rate, per-consumer breakdown |
-| **Climate & Environment** | Room temperatures, humidity, CO₂ levels, outdoor temperature, heating supply & hot water temps |
-| **Miniserver Health** | System heap/tasks, LAN and CAN bus traffic and error rates |
-| **Lighting & Controls** | Light switch states, active moods, per-zone energy, operating mode |
+### ⚡ Energy Overview
 
-## How These Dashboards Were Created
+Power consumption, grid draw, PV production, battery storage, self-consumption rate, per-consumer breakdown.
+
+![Energy Overview](pics/Energy%20Overview.png)
+
+### 🌡️ Climate & Environment
+
+Room temperatures, humidity, CO₂ levels, outdoor temperature, heating supply & hot water temps.
+
+![Climate & Indoor Environment](pics/Climate%20and%20Indoor%20Environment.png)
+
+### 🖥️ Miniserver Health
+
+System heap/tasks, LAN and CAN bus traffic and error rates.
+
+![Miniserver Health](pics/Miniserver%20Health.png)
+
+### 💡 Lighting & Controls
+
+Light switch states, active moods, per-zone energy, operating mode.
+
+![Lighting & Controls](pics/Lightning%20and%20Controls.png)
+
+## 🤖 How These Dashboards Were Created
 
 The dashboard YAML files in this repo were built iteratively using [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (Anthropic's AI coding agent) and deployed to Dynatrace via [`dtctl`](https://github.com/dynatrace-oss/dtctl). The workflow looked like this:
 
-1. **Export metrics** from the Loxone Miniserver using `lox otel serve` to push OpenTelemetry data into Dynatrace.
-2. **Author dashboards as code** — Claude Code generated the Dynatrace dashboard YAML definitions (DQL queries, layouts, visualizations, thresholds) based on the available metric names and desired visualizations.
-3. **Deploy with `dtctl`** — `dtctl apply -f dashboards/*.yaml` pushes the dashboard definitions to the Dynatrace environment.
-4. **Review and iterate** — screenshots of the live dashboards were fed back into Claude Code to identify visual and logical improvements (layout balance, threshold tuning, missing metrics, query fixes), which were then applied directly to the YAML files.
+1. 📤 **Export metrics** from the Loxone Miniserver using `lox otel serve` to push OpenTelemetry data into Dynatrace.
+2. 🧠 **Author dashboards as code** — Claude Code generated the Dynatrace dashboard YAML definitions (DQL queries, layouts, visualizations, thresholds) based on the available metric names and desired visualizations.
+3. 🚀 **Deploy with `dtctl`** — `dtctl apply -f dashboards/*.yaml` pushes the dashboard definitions to the Dynatrace environment.
+4. 🔄 **Review and iterate** — screenshots of the live dashboards were fed back into Claude Code to identify visual and logical improvements (layout balance, threshold tuning, missing metrics, query fixes), which were then applied directly to the YAML files.
 
-This "dashboards as code" approach makes the dashboards version-controlled, reproducible, and easy to share or adapt for other Loxone setups.
+This "dashboards as code" approach makes the dashboards version-controlled, reproducible, and easy to share or adapt for other Loxone setups. ✨
 
-## License
+## 📄 License
 
 Apache 2.0

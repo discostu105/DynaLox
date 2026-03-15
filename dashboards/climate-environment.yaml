@@ -114,7 +114,8 @@ content:
   tiles:
     header:
       content: |-
-        ### Climate & Indoor Environment
+        ![Loxone](https://www.loxone.com/int/wp-content/uploads/sites/21/2022/06/IG-Miniserver.png)
+        ### 🌡️ Climate & Indoor Environment
         Room temperatures, humidity, CO₂ levels, and heating system performance across all zones.
       type: markdown
     indoor-temp:
@@ -261,7 +262,7 @@ content:
             isEnabled: true
             value: 0
     temp-header:
-      content: '#### Room Temperatures'
+      content: '#### 🌡️ Room Temperatures'
       type: markdown
     temp-timeseries:
       davis:
@@ -296,7 +297,7 @@ content:
           legend:
             hidden: true
     humidity-header:
-      content: '#### Humidity'
+      content: '#### 💧 Humidity'
       type: markdown
     humidity-timeseries:
       davis:
@@ -339,7 +340,7 @@ content:
             isEnabled: true
             value: 0
     co2-header:
-      content: '#### CO₂ Levels'
+      content: '#### 🌬️ CO₂ Levels'
       type: markdown
     co2-timeseries:
       davis:
@@ -379,7 +380,7 @@ content:
             isEnabled: true
             value: 0
     heating-header:
-      content: '#### Heating System'
+      content: '#### 🔥 Heating System'
       type: markdown
     vorlauf-timeseries:
       davis:
