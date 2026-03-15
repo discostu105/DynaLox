@@ -5,91 +5,106 @@ content:
   annotations: []
   importedWithCode: false
   layouts:
-    avg-outdoor:
-      h: 3
-      w: 6
-      x: 6
-      "y": 1
-    co2-current:
-      h: 6
-      w: 8
-      x: 16
-      "y": 20
-    co2-header:
-      h: 1
-      w: 24
-      x: 0
-      "y": 19
-    co2-timeseries:
-      h: 6
-      w: 16
-      x: 0
-      "y": 20
     header:
-      h: 1
+      h: 2
       w: 24
       x: 0
       "y": 0
-    heating-header:
-      h: 1
-      w: 24
-      x: 0
-      "y": 26
-    heating-mode:
+    indoor-temp:
       h: 3
-      w: 6
+      w: 4
+      x: 0
+      "y": 2
+    source-temp:
+      h: 3
+      w: 4
+      x: 4
+      "y": 2
+    vorlauf-kpi:
+      h: 3
+      w: 4
+      x: 8
+      "y": 2
+    warmwasser-kpi:
+      h: 3
+      w: 4
       x: 12
-      "y": 1
-    humidity-current:
-      h: 6
-      w: 8
-      x: 16
-      "y": 13
-    humidity-header:
-      h: 1
-      w: 24
-      x: 0
-      "y": 12
-    humidity-timeseries:
-      h: 6
-      w: 16
-      x: 0
-      "y": 13
-    open-windows:
+      "y": 2
+    humidity-kpi:
       h: 3
-      w: 6
-      x: 18
-      "y": 1
-    outdoor-temp:
-      h: 3
-      w: 6
-      x: 0
-      "y": 1
-    temp-current:
-      h: 7
-      w: 8
+      w: 4
       x: 16
-      "y": 5
+      "y": 2
+    co2-kpi:
+      h: 3
+      w: 4
+      x: 20
+      "y": 2
     temp-header:
       h: 1
       w: 24
       x: 0
-      "y": 4
+      "y": 5
     temp-timeseries:
       h: 7
       w: 16
       x: 0
-      "y": 5
-    vorlauf-timeseries:
+      "y": 6
+    temp-honeycomb:
+      h: 7
+      w: 8
+      x: 16
+      "y": 6
+    humidity-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 13
+    humidity-timeseries:
       h: 6
-      w: 12
+      w: 16
+      x: 0
+      "y": 14
+    humidity-current:
+      h: 6
+      w: 8
+      x: 16
+      "y": 14
+    co2-header:
+      h: 1
+      w: 24
+      x: 0
+      "y": 20
+    co2-timeseries:
+      h: 6
+      w: 16
+      x: 0
+      "y": 21
+    co2-current:
+      h: 6
+      w: 8
+      x: 16
+      "y": 21
+    heating-header:
+      h: 1
+      w: 24
       x: 0
       "y": 27
+    vorlauf-timeseries:
+      h: 8
+      w: 8
+      x: 0
+      "y": 28
     warmwasser-timeseries:
-      h: 6
-      w: 12
-      x: 12
-      "y": 27
+      h: 8
+      w: 8
+      x: 8
+      "y": 28
+    bt10-timeseries:
+      h: 8
+      w: 8
+      x: 16
+      "y": 28
   settings:
     defaultTimeframe:
       enabled: true
@@ -97,107 +112,211 @@ content:
         from: now()-24h
         to: now()
   tiles:
-    avg-outdoor:
+    header:
+      content: |-
+        ### Climate & Indoor Environment
+        Room temperatures, humidity, CO₂ levels, and heating system performance across all zones.
+      type: markdown
+    indoor-temp:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Intelligente Raumregelung" AND state.name == "averageOutdoorTemp" AND unit == "°" } | fieldsAdd last = arrayLast(val) | fields last'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: Average Outdoor Temp
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Intelligente Raumregelung" AND state.name == "tempActual" AND unit == "°" } | fieldsAdd last = arrayLast(val)'
+      title: Indoor Temp
       type: data
       visualization: singleValue
       visualizationSettings:
         autoSelectVisualization: false
         singleValue:
-          label: °C
           recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-categorical-color-13-default, #006bba)'
+            isVisible: true
           trend:
             isVisible: false
-    co2-current:
+        unitsOverrides:
+          - baseUnit: degree-celsius
+            identifier: last
+            unitCategory: temperature
+    source-temp:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "CO2" AND state.name == "value" AND unit == "ppm" }, by: { control.room } | fieldsAdd current = arrayLast(val) | filter isNotNull(current) | sort current desc'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: Current CO₂
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Eintritt Wärmequellenmedium [BT10]" AND state.name == "value" AND unit == "°C" } | fieldsAdd last = arrayLast(val)'
+      title: Heat Source (BT10)
       type: data
-      visualization: barChart
+      visualization: singleValue
       visualizationSettings:
         autoSelectVisualization: false
-        chartSettings:
-          legend:
-            hidden: true
-    co2-header:
-      content: '### CO₂ Levels'
-      type: markdown
-    co2-timeseries:
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-categorical-themed-swamps-color-01-default, #006650)'
+            isVisible: true
+          trend:
+            isVisible: false
+        unitsOverrides:
+          - baseUnit: degree-celsius
+            identifier: last
+            unitCategory: temperature
+    vorlauf-kpi:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "CO2" AND state.name == "value" AND unit == "ppm" }, by: { control.room }'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: CO₂ Over Time (ppm)
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Heizung Vorlauf [BT2]" AND state.name == "value" } | fieldsAdd last = arrayLast(val)'
+      title: Supply Temp (BT2)
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+            isVisible: true
+          trend:
+            isVisible: false
+        unitsOverrides:
+          - baseUnit: degree-celsius
+            identifier: last
+            unitCategory: temperature
+    warmwasser-kpi:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Warmwasser [BT7]" AND state.name == "value" } | fieldsAdd last = arrayLast(val)'
+      title: Hot Water (BT7)
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+            isVisible: true
+          trend:
+            isVisible: false
+        unitsOverrides:
+          - baseUnit: degree-celsius
+            identifier: last
+            unitCategory: temperature
+    humidity-kpi:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Luftfeuchte" AND state.name == "value" AND (unit == "%" OR unit == "%%") } | fieldsAdd last = arrayLast(val)'
+      title: Avg Humidity
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          recordField: last
+          sparklineSettings:
+            color:
+              Default: 'var(--dt-colors-charts-categorical-color-01-default, #134fc9)'
+            isVisible: true
+          trend:
+            isVisible: false
+        unitsOverrides:
+          - baseUnit: percent
+            identifier: last
+            unitCategory: percentage
+    co2-kpi:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "CO2" AND state.name == "value" AND unit == "ppm" } | fieldsAdd last = arrayLast(val)'
+      title: Avg CO₂
+      type: data
+      visualization: singleValue
+      visualizationSettings:
+        autoSelectVisualization: false
+        singleValue:
+          label: ppm
+          recordField: last
+          sparklineSettings:
+            isVisible: true
+          trend:
+            isVisible: false
+        thresholds:
+          - color: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+            isEnabled: true
+            value: 1000
+          - color: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+            isEnabled: true
+            value: 800
+          - color: 'var(--dt-colors-charts-status-success-default, #2a7453)'
+            isEnabled: true
+            value: 0
+    temp-header:
+      content: '#### Room Temperatures'
+      type: markdown
+    temp-timeseries:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.category == "Temperatur" AND state.name == "value" }, by: { control.room }'
+      title: Temperature Over Time
       type: data
       visualization: lineChart
       visualizationSettings:
         autoSelectVisualization: false
-    header:
-      content: "## \U0001F321\uFE0F Climate & Indoor Environment"
-      type: markdown
-    heating-header:
-      content: '### Heating System'
-      type: markdown
-    heating-mode:
+        chartSettings:
+          gapPolicy: connect
+    temp-honeycomb:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Intelligente Raumregelung/Heating and Cooling" AND state.name == "mode" } | fieldsAdd last = arrayLast(val) | fields last'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: HVAC Mode
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.category == "Temperatur" AND state.name == "value" }, by: { control.room } | fieldsAdd current = arrayLast(val) | filter isNotNull(current) | fields control.room, current | sort current desc'
+      title: Current Temperatures
       type: data
-      visualization: singleValue
+      visualization: honeycomb
       visualizationSettings:
         autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          trend:
-            isVisible: false
+        honeycomb:
+          colorPalette: temperature
+          dataMappings:
+            value: current
+          displayedFields:
+            - control.room
+          legend:
+            hidden: true
+    humidity-header:
+      content: '#### Humidity'
+      type: markdown
+    humidity-timeseries:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Luftfeuchte" AND state.name == "value" AND (unit == "%" OR unit == "%%") }, by: { control.room }'
+      title: Humidity Over Time (%)
+      type: data
+      visualization: lineChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          gapPolicy: connect
     humidity-current:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Luftfeuchte" AND state.name == "value" AND (unit == "%" OR unit == "%%") }, by: { control.room } | fieldsAdd current = arrayLast(val) | filter isNotNull(current) | sort current desc'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
       title: Current Humidity
       type: data
       visualization: barChart
@@ -206,201 +325,124 @@ content:
         chartSettings:
           legend:
             hidden: true
-    humidity-header:
-      content: '### Humidity'
-      type: markdown
-    humidity-timeseries:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Luftfeuchte" AND state.name == "value" AND (unit == "%" OR unit == "%%") }, by: { control.room }'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: Humidity Over Time (%)
-      type: data
-      visualization: lineChart
-      visualizationSettings:
-        autoSelectVisualization: false
-    open-windows:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Intelligente Raumregelung" AND state.name == "openWindow" AND unit == "°" } | fieldsAdd last = arrayLast(val) | fields last'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: Open Windows
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          recordField: last
-          trend:
-            isVisible: false
-    outdoor-temp:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Intelligente Raumregelung" AND state.name == "actualOutdoorTemp" AND unit == "°" } | fieldsAdd last = arrayLast(val) | fields last'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: Outdoor Temperature
-      type: data
-      visualization: singleValue
-      visualizationSettings:
-        autoSelectVisualization: false
-        singleValue:
-          label: °C
-          recordField: last
-          trend:
-            isVisible: false
-        thresholdOrder: desc
         thresholds:
-          - color: 'var(--dt-colors-charts-status-critical-default, #d94040)'
+          - color: 'var(--dt-colors-charts-status-critical-default, #c62239)'
             isEnabled: true
-            value: 30
-          - color: 'var(--dt-colors-charts-status-warning-default, #f5d30f)'
+            value: 60
+          - color: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
             isEnabled: true
-            value: 25
+            value: 50
           - color: 'var(--dt-colors-charts-status-success-default, #2a7453)'
             isEnabled: true
-            value: 10
-          - color: 'var(--dt-colors-charts-categorical-color-01-default, #134fc9)'
+            value: 30
+          - color: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
             isEnabled: true
-            value: -100
-    temp-current:
-      davis:
-        davisVisualization:
-          isAvailable: true
-        enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.category == "Temperatur" AND state.name == "value" }, by: { control.room } | fieldsAdd current = arrayLast(val) | filter isNotNull(current) | fields control.room, current | sort current desc'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: Current Temperatures
-      type: data
-      visualization: table
-      visualizationSettings:
-        autoSelectVisualization: false
-    temp-header:
-      content: '### Room Temperatures'
+            value: 0
+    co2-header:
+      content: '#### CO₂ Levels'
       type: markdown
-    temp-timeseries:
+    co2-timeseries:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
-      query: 'timeseries val = avg(loxone.control.value), filter: { control.category == "Temperatur" AND state.name == "value" }, by: { control.room }'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: Temperature Over Time
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "CO2" AND state.name == "value" AND unit == "ppm" }, by: { control.room }'
+      title: CO₂ Over Time (ppm)
       type: data
       visualization: lineChart
       visualizationSettings:
         autoSelectVisualization: false
+        chartSettings:
+          gapPolicy: connect
+    co2-current:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "CO2" AND state.name == "value" AND unit == "ppm" }, by: { control.room } | fieldsAdd current = arrayLast(val) | filter isNotNull(current) | sort current desc'
+      title: Current CO₂
+      type: data
+      visualization: barChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          legend:
+            hidden: true
+        thresholds:
+          - color: 'var(--dt-colors-charts-status-critical-default, #c62239)'
+            isEnabled: true
+            value: 1000
+          - color: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
+            isEnabled: true
+            value: 800
+          - color: 'var(--dt-colors-charts-status-success-default, #2a7453)'
+            isEnabled: true
+            value: 0
+    heating-header:
+      content: '#### Heating System'
+      type: markdown
     vorlauf-timeseries:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Heizung Vorlauf [BT2]" AND state.name == "value" }'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: Heating Supply Temp (Vorlauf BT2)
+      title: Supply Temp (BT2)
       type: data
-      visualization: lineChart
+      visualization: areaChart
       visualizationSettings:
         autoSelectVisualization: false
         chartSettings:
+          gapPolicy: connect
           legend:
             hidden: true
           seriesOverrides:
             - override:
                 color:
-                  Default: 'var(--dt-colors-charts-status-critical-default, #d94040)'
+                  Default: 'var(--dt-colors-charts-status-critical-default, #c62239)'
               seriesId:
                 - val
-        coloring:
-          colorRules:
-            - colorMode: color-palette
-              colorPalette: categorical
-              comparator: = *value*
-              field: DT.name
-              type: string
-              value: ""
-            - colorMode: custom-color
-              comparator: =
-              customColor:
-                Default: 'var(--dt-colors-charts-status-critical-default, #d94040)'
-              field: DT.name
-              type: string
-              value: val
     warmwasser-timeseries:
       davis:
         davisVisualization:
           isAvailable: true
         enabled: false
       query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Warmwasser [BT7]" AND state.name == "value" }'
-      querySettings:
-        defaultSamplingRatio: 10
-        defaultScanLimitGbytes: 500
-        enableSampling: false
-        maxResultMegaBytes: 1
-        maxResultRecords: 1000
-      title: Hot Water Temp (BT7)
+      title: Hot Water (BT7)
       type: data
-      visualization: lineChart
+      visualization: areaChart
       visualizationSettings:
         autoSelectVisualization: false
         chartSettings:
+          gapPolicy: connect
           legend:
             hidden: true
           seriesOverrides:
             - override:
                 color:
-                  Default: 'var(--dt-colors-charts-status-warning-default, #f5d30f)'
+                  Default: 'var(--dt-colors-charts-status-warning-default, #eea53c)'
               seriesId:
                 - val
-        coloring:
-          colorRules:
-            - colorMode: color-palette
-              colorPalette: categorical
-              comparator: = *value*
-              field: DT.name
-              type: string
-              value: ""
-            - colorMode: custom-color
-              comparator: =
-              customColor:
-                Default: 'var(--dt-colors-charts-status-warning-default, #f5d30f)'
-              field: DT.name
-              type: string
-              value: val
+    bt10-timeseries:
+      davis:
+        davisVisualization:
+          isAvailable: true
+        enabled: false
+      query: 'timeseries val = avg(loxone.control.value), filter: { control.name == "Eintritt Wärmequellenmedium [BT10]" AND state.name == "value" }'
+      title: Heat Source Inlet (BT10)
+      type: data
+      visualization: areaChart
+      visualizationSettings:
+        autoSelectVisualization: false
+        chartSettings:
+          gapPolicy: connect
+          legend:
+            hidden: true
+          seriesOverrides:
+            - override:
+                color:
+                  Default: 'var(--dt-colors-charts-categorical-themed-swamps-color-01-default, #006650)'
+              seriesId:
+                - val
   variables: []
   version: 21

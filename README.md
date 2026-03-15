@@ -168,6 +168,17 @@ dtctl apply -f dashboards/lighting-controls.yaml
 | **Miniserver Health** | System heap/tasks, LAN and CAN bus traffic and error rates |
 | **Lighting & Controls** | Light switch states, active moods, per-zone energy, operating mode |
 
+## How These Dashboards Were Created
+
+The dashboard YAML files in this repo were built iteratively using [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (Anthropic's AI coding agent) and deployed to Dynatrace via [`dtctl`](https://github.com/dynatrace-oss/dtctl). The workflow looked like this:
+
+1. **Export metrics** from the Loxone Miniserver using `lox otel serve` to push OpenTelemetry data into Dynatrace.
+2. **Author dashboards as code** — Claude Code generated the Dynatrace dashboard YAML definitions (DQL queries, layouts, visualizations, thresholds) based on the available metric names and desired visualizations.
+3. **Deploy with `dtctl`** — `dtctl apply -f dashboards/*.yaml` pushes the dashboard definitions to the Dynatrace environment.
+4. **Review and iterate** — screenshots of the live dashboards were fed back into Claude Code to identify visual and logical improvements (layout balance, threshold tuning, missing metrics, query fixes), which were then applied directly to the YAML files.
+
+This "dashboards as code" approach makes the dashboards version-controlled, reproducible, and easy to share or adapt for other Loxone setups.
+
 ## License
 
 Apache 2.0
