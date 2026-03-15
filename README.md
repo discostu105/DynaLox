@@ -169,25 +169,25 @@ dtctl apply -f dashboards/lighting-controls.yaml
 
 Power consumption, grid draw, PV production, battery storage, self-consumption rate, per-consumer breakdown.
 
-![Energy Overview](pics/Energy%20Overview.png)
+![Energy Overview](pics/Energy.jpeg)
 
 ### 🌡️ Climate & Environment
 
 Room temperatures, humidity, CO₂ levels, outdoor temperature, heating supply & hot water temps.
 
-![Climate & Indoor Environment](pics/Climate%20and%20Indoor%20Environment.png)
+![Climate & Indoor Environment](pics/Climate.jpeg)
 
 ### 🖥️ Miniserver Health
 
 System heap/tasks, LAN and CAN bus traffic and error rates.
 
-![Miniserver Health](pics/Miniserver%20Health.png)
+![Miniserver Health](pics/Miniserver.jpeg)
 
 ### 💡 Lighting & Controls
 
 Light switch states, active moods, per-zone energy, operating mode.
 
-![Lighting & Controls](pics/Lightning%20and%20Controls.png)
+![Lighting & Controls](pics/Lightning.jpeg)
 
 ## 🤖 How These Dashboards Were Created
 
